@@ -23,19 +23,21 @@ public class AwsSesEmailSenderProvider implements EmailSenderProvider {
 
     private static final String UTF8 = "utf-8";
 
+    private final Map<String, String> configMap;
     private final AmazonSimpleEmailService ses;
 
-    AwsSesEmailSenderProvider(AmazonSimpleEmailService ses) {
+    AwsSesEmailSenderProvider(Map<String, String> configMap, AmazonSimpleEmailService ses) {
+        this.configMap = configMap;
         this.ses = ses;
     }
 
     public void send(Map<String, String> config, org.keycloak.models.UserModel user, String subject, String textBody, String htmlBody) throws EmailException {
-        String configurationset = config.get("configurationset");
+        String configSetName = this.configMap.get("configSetName");
 
-        String from = config.get("from");
-        String fromDisplayName = config.get("fromDisplayName");
-        String replyTo = config.get("replyTo");
-        String replyToDisplayName = config.get("replyToDisplayName");
+        String from = this.configMap.get("from");
+        String fromDisplayName = this.configMap.get("fromDisplayName");
+        String replyTo = this.configMap.get("replyTo");
+        String replyToDisplayName = this.configMap.get("replyToDisplayName");
 
         try {
             SendEmailRequest sendEmailRequest = new SendEmailRequest()
@@ -56,8 +58,8 @@ public class AwsSesEmailSenderProvider implements EmailSenderProvider {
                     Collections.singletonList(toInternetAddress(replyTo, replyToDisplayName).toString()));
             }
 
-            if (configurationset != null && !configurationset.isEmpty()) {
-                sendEmailRequest.setConfigurationSetName(configurationset);
+            if (configSetName != null && !configSetName.isEmpty()) {
+                sendEmailRequest.setConfigurationSetName(configSetName);
             }
 
             ses.sendEmail(sendEmailRequest);
