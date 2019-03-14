@@ -1,8 +1,6 @@
 package dasniko.keycloak.provider.email.aws;
 
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
-import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
 import com.amazonaws.services.simpleemail.model.Body;
 import com.amazonaws.services.simpleemail.model.Content;
 import com.amazonaws.services.simpleemail.model.Destination;
@@ -25,8 +23,13 @@ public class AwsSesEmailSenderProvider implements EmailSenderProvider {
 
     private static final String UTF8 = "utf-8";
 
+    private final AmazonSimpleEmailService ses;
+
+    AwsSesEmailSenderProvider(AmazonSimpleEmailService ses) {
+        this.ses = ses;
+    }
+
     public void send(Map<String, String> config, org.keycloak.models.UserModel user, String subject, String textBody, String htmlBody) throws EmailException {
-        String region = config.getOrDefault("region", Regions.EU_WEST_1.getName());
         String configurationset = config.get("configurationset");
 
         String from = config.get("from");
@@ -35,9 +38,6 @@ public class AwsSesEmailSenderProvider implements EmailSenderProvider {
         String replyToDisplayName = config.get("replyToDisplayName");
 
         try {
-
-            AmazonSimpleEmailService ses = AmazonSimpleEmailServiceClientBuilder.standard().withRegion(region).build();
-
             SendEmailRequest sendEmailRequest = new SendEmailRequest()
                 .withDestination(
                     new Destination().withToAddresses(user.getEmail())
