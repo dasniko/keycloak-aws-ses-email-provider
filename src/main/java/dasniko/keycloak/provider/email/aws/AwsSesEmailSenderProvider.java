@@ -40,6 +40,10 @@ public class AwsSesEmailSenderProvider implements EmailSenderProvider {
         String replyToDisplayName = this.configMap.get("replyToDisplayName");
 
         try {
+            if (from == null || from.isEmpty()) {
+                throw new Exception("Missing 'from' email address.");
+            }
+
             SendEmailRequest sendEmailRequest = new SendEmailRequest()
                 .withDestination(
                     new Destination().withToAddresses(user.getEmail())
