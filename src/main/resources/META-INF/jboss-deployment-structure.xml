@@ -3,13 +3,9 @@
     <deployment>
         <dependencies>
             <module name="javax.api" export="true"/>
-            <module name="javax.xml.stream.api" export="true"/>
-            <module name="javax.xml.bind.api" export="true"/>
             <module name="com.fasterxml.jackson.core.jackson-core" export="true"/>
-            <module name="com.fasterxml.jackson.core.jackson-databind" export="true"/>
             <module name="org.apache.httpcomponents.core" export="true"/>
             <module name="org.apache.commons.logging" export="true"/>
-            <module name="org.joda.time" export="true"/>
             <module name="org.jboss.logging" export="true" />
             <module name="org.keycloak.keycloak-core" export="true" />
             <module name="org.keycloak.keycloak-server-spi" export="true" />

@@ -8,8 +8,12 @@ So, you're on your own when using it.
 Generally, this project is _work in progress_.
 
 ## Dependencies
-The implementation currently uses the AWS Java API Version 1.
+
+The implementation uses the AWS Java API Version 2.
 This dependency will be packaged with the help of the Maven Shade Plugin into the target JAR archive.
+
+To save space and build a smaller fat-jar, all the async resources have been excluded from the AWS SDK.
+The email provider just uses the synchronous client.
 
 All other dependencies are used from Keycloaks underlying Wildfly server
 (see [jboss-deployment-structure.xml](./src/main/resources/META-INF/jboss-deployment-structure.xml)).

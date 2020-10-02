@@ -13,8 +13,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <aws.version>1.11.874</aws.version>
-        <junit.version>5.4.0</junit.version>
+        <aws.version>2.15.1</aws.version>
+        <junit.version>5.7.0</junit.version>
         <keycloak.version>11.0.1</keycloak.version>
         <maven-shade.version>3.2.4</maven-shade.version>
         <maven-surefire.version>2.22.2</maven-surefire.version>
@@ -38,10 +38,15 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-ses</artifactId>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>ses</artifactId>
             <version>${aws.version}</version>
-            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>software.amazon.awssdk</groupId>
+                    <artifactId>netty-nio-client</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -87,9 +92,9 @@
                             <artifactSet>
                                 <excludes>
                                     <exclude>com.fasterxml.jackson.core</exclude>
-                                    <exclude>com.fasterxml.jackson.dataformat</exclude>
                                     <exclude>org.apache.httpcomponents</exclude>
-                                    <exclude>joda-time</exclude>
+                                    <exclude>commons-logging</exclude>
+                                    <exclude>commons-codec</exclude>
                                 </excludes>
                             </artifactSet>
                         </configuration>

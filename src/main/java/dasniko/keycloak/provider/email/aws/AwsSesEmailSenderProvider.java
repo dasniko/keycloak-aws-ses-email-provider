@@ -1,17 +1,18 @@
 package dasniko.keycloak.provider.email.aws;
 
-import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
-import com.amazonaws.services.simpleemail.model.Body;
-import com.amazonaws.services.simpleemail.model.Content;
-import com.amazonaws.services.simpleemail.model.Destination;
-import com.amazonaws.services.simpleemail.model.Message;
-import com.amazonaws.services.simpleemail.model.SendEmailRequest;
 import org.keycloak.email.EmailException;
 import org.keycloak.email.EmailSenderProvider;
 import org.keycloak.models.UserModel;
 import org.keycloak.services.ServicesLogger;
+import software.amazon.awssdk.services.ses.SesClient;
+import software.amazon.awssdk.services.ses.model.Body;
+import software.amazon.awssdk.services.ses.model.Content;
+import software.amazon.awssdk.services.ses.model.Destination;
+import software.amazon.awssdk.services.ses.model.Message;
+import software.amazon.awssdk.services.ses.model.SendEmailRequest;
 
 import javax.mail.internet.InternetAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 
@@ -20,12 +21,10 @@ import java.util.Map;
  */
 public class AwsSesEmailSenderProvider implements EmailSenderProvider {
 
-    private static final String UTF8 = "utf-8";
-
     private final Map<String, String> configMap;
-    private final AmazonSimpleEmailService ses;
+    private final SesClient ses;
 
-    AwsSesEmailSenderProvider(Map<String, String> configMap, AmazonSimpleEmailService ses) {
+    AwsSesEmailSenderProvider(Map<String, String> configMap, SesClient ses) {
         this.configMap = configMap;
         this.ses = ses;
     }
@@ -44,29 +43,31 @@ public class AwsSesEmailSenderProvider implements EmailSenderProvider {
                 throw new Exception("Missing 'from' email address.");
             }
 
-            SendEmailRequest sendEmailRequest = new SendEmailRequest()
-                .withDestination(
-                    new Destination().withToAddresses(user.getEmail())
+            SendEmailRequest.Builder sendEmailRequest = SendEmailRequest.builder()
+                .destination(
+                    Destination.builder().toAddresses(user.getEmail()).build()
                 )
-                .withMessage(new Message()
-                    .withSubject(new Content().withCharset(UTF8).withData(subject))
-                    .withBody(new Body()
-                        .withHtml(new Content().withCharset(UTF8).withData(htmlBody))
-                        .withText(new Content().withCharset(UTF8).withData(textBody))
+                .message(Message.builder()
+                    .subject(Content.builder().charset(StandardCharsets.UTF_8.toString()).data(subject).build())
+                    .body(Body.builder()
+                        .html(Content.builder().charset(StandardCharsets.UTF_8.toString()).data(htmlBody).build())
+                        .text(Content.builder().charset(StandardCharsets.UTF_8.toString()).data(textBody).build())
+                        .build()
                     )
+                    .build()
                 )
-                .withSource(toInternetAddress(from, fromDisplayName).toString());
+                .source(toInternetAddress(from, fromDisplayName).toString());
 
             if (replyTo != null && !replyTo.isEmpty()) {
-                sendEmailRequest.setReplyToAddresses(
+                sendEmailRequest.replyToAddresses(
                     Collections.singletonList(toInternetAddress(replyTo, replyToDisplayName).toString()));
             }
 
             if (configSetName != null && !configSetName.isEmpty()) {
-                sendEmailRequest.setConfigurationSetName(configSetName);
+                sendEmailRequest.configurationSetName(configSetName);
             }
 
-            ses.sendEmail(sendEmailRequest);
+            ses.sendEmail(sendEmailRequest.build());
 
         } catch (Exception e) {
             ServicesLogger.LOGGER.failedToSendEmail(e);
@@ -81,7 +82,7 @@ public class AwsSesEmailSenderProvider implements EmailSenderProvider {
         if (displayName == null || "".equals(displayName.trim())) {
             return new InternetAddress(email);
         }
-        return new InternetAddress(email, displayName, UTF8);
+        return new InternetAddress(email, displayName, StandardCharsets.UTF_8.toString());
     }
 
     @Override

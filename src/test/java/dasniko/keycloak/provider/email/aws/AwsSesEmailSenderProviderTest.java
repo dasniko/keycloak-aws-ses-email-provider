@@ -1,13 +1,13 @@
 package dasniko.keycloak.provider.email.aws;
 
-import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
-import com.amazonaws.services.simpleemail.model.SendEmailRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.keycloak.email.EmailException;
 import org.keycloak.models.UserModel;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import software.amazon.awssdk.services.ses.SesClient;
+import software.amazon.awssdk.services.ses.model.SendEmailRequest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,7 @@ class AwsSesEmailSenderProviderTest {
     @Mock
     private UserModel user;
     @Mock
-    private AmazonSimpleEmailService ses;
+    private SesClient ses;
 
     @BeforeEach
     void before() {
@@ -53,9 +53,8 @@ class AwsSesEmailSenderProviderTest {
         Map<String, String> configMap = new HashMap<>();
         provider = new AwsSesEmailSenderProvider(configMap, ses);
 
-        Throwable exception = assertThrows(EmailException.class, () -> {
-            provider.send(null, user, "Subject", "Text Body", "Html Body");
-        });
+        Throwable exception = assertThrows(EmailException.class,
+            () -> provider.send(null, user, "Subject", "Text Body", "Html Body"));
 
         assertTrue(exception.getMessage().contains("from"));
     }

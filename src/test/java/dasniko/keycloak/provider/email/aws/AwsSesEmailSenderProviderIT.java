@@ -1,12 +1,11 @@
 package dasniko.keycloak.provider.email.aws;
 
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
-import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.keycloak.email.EmailException;
 import org.keycloak.models.UserModel;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.ses.SesClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +21,7 @@ class AwsSesEmailSenderProviderIT {
     @Test
     @Disabled("Run only manually")
     void testSend() throws EmailException {
-        AmazonSimpleEmailService ses = AmazonSimpleEmailServiceClientBuilder.standard().withRegion(Regions.EU_WEST_1).build();
+        SesClient ses = SesClient.builder().region(Region.EU_WEST_1).build();
 
         Map<String, String> configMap = new HashMap<>();
         configMap.put("from", "niko@n-k.de");

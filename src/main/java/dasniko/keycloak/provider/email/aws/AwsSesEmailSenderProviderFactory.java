@@ -1,14 +1,13 @@
 package dasniko.keycloak.provider.email.aws;
 
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
-import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
 import org.keycloak.Config;
 import org.keycloak.email.EmailSenderProvider;
 import org.keycloak.email.EmailSenderProviderFactory;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.provider.ServerInfoAwareProviderFactory;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.ses.SesClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +18,7 @@ import java.util.Map;
 public class AwsSesEmailSenderProviderFactory implements EmailSenderProviderFactory, ServerInfoAwareProviderFactory {
 
     private Map<String, String> configMap;
-    private AmazonSimpleEmailService ses;
+    private SesClient ses;
 
     @Override
     public EmailSenderProvider create(KeycloakSession session) {
@@ -34,8 +33,8 @@ public class AwsSesEmailSenderProviderFactory implements EmailSenderProviderFact
             configMap.put(key, config.get(key));
         }
 
-        String region = config.get("region", Regions.EU_WEST_1.getName());
-        this.ses = AmazonSimpleEmailServiceClientBuilder.standard().withRegion(region).build();
+        Region region = Region.of(config.get("region"));
+        this.ses = SesClient.builder().region(region).build();
     }
 
     @Override
@@ -53,6 +52,8 @@ public class AwsSesEmailSenderProviderFactory implements EmailSenderProviderFact
 
     @Override
     public Map<String, String> getOperationalInfo() {
-        return configMap;
+        Map<String, String> info = new HashMap<>(configMap);
+        info.put("AWS-API", "v2");
+        return info;
     }
 }
