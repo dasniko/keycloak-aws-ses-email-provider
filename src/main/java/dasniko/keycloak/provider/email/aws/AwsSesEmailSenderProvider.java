@@ -8,11 +8,10 @@ import com.amazonaws.services.simpleemail.model.Message;
 import com.amazonaws.services.simpleemail.model.SendEmailRequest;
 import org.keycloak.email.EmailException;
 import org.keycloak.email.EmailSenderProvider;
+import org.keycloak.models.UserModel;
 import org.keycloak.services.ServicesLogger;
 
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
-import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.Map;
 
@@ -31,7 +30,8 @@ public class AwsSesEmailSenderProvider implements EmailSenderProvider {
         this.ses = ses;
     }
 
-    public void send(Map<String, String> config, org.keycloak.models.UserModel user, String subject, String textBody, String htmlBody) throws EmailException {
+    @Override
+    public void send(Map<String, String> config, UserModel user, String subject, String textBody, String htmlBody) throws EmailException {
         String configSetName = this.configMap.get("configSetName");
 
         String from = this.configMap.get("from");
@@ -74,7 +74,7 @@ public class AwsSesEmailSenderProvider implements EmailSenderProvider {
         }
     }
 
-    private InternetAddress toInternetAddress(String email, String displayName) throws UnsupportedEncodingException, AddressException, EmailException {
+    private InternetAddress toInternetAddress(String email, String displayName) throws Exception {
         if (email == null || "".equals(email.trim())) {
             throw new EmailException("Please provide a valid address", null);
         }
