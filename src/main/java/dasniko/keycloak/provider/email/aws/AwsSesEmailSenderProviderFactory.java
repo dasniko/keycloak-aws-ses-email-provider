@@ -22,19 +22,17 @@ public class AwsSesEmailSenderProviderFactory implements EmailSenderProviderFact
 
     @Override
     public EmailSenderProvider create(KeycloakSession session) {
-        return new AwsSesEmailSenderProvider(configMap, ses);
+        return new AwsSesEmailSenderProvider(ses);
     }
 
     @Override
     public void init(Config.Scope config) {
-        String[] configKeys = {"region", "configSetName", "from", "fromDisplayName", "replyTo", "replyToDisplayName"};
-        this.configMap = new HashMap<>();
-        for (String key : configKeys) {
-            configMap.put(key, config.get(key));
-        }
+        String configRegion = config.get("region");
+        configMap = new HashMap<>();
+        configMap.put("region", configRegion);
 
-        Region region = Region.of(config.get("region"));
-        this.ses = SesClient.builder().region(region).build();
+        Region region = Region.of(configRegion);
+        ses = SesClient.builder().region(region).build();
     }
 
     @Override
@@ -52,8 +50,6 @@ public class AwsSesEmailSenderProviderFactory implements EmailSenderProviderFact
 
     @Override
     public Map<String, String> getOperationalInfo() {
-        Map<String, String> info = new HashMap<>(configMap);
-        info.put("AWS-API", "v2");
-        return info;
+        return configMap;
     }
 }

@@ -1,6 +1,6 @@
 # Keycloak Email Provider for AWS SES (Simple Email Service)
 
-This is an email provider SPI implementation for [Keycloak SSO](https://www.keycloak.org) server.
+This is a drop-in Email Provider SPI replacement implementation for [Keycloak SSO](https://www.keycloak.org) server.
 It's for demo purposes only and can be used as base for your own implementation.
 
 The codebase is provided _as-is_ and might not be free of errors.
@@ -36,11 +36,6 @@ To configure the email provider SPI, include a snippet like this in your `standa
     <provider name="aws-ses" enabled="true">
       <properties>
         <property name="region" value="eu-west-1"/>
-        <property name="from" value="sender@example.com"/>
-        <property name="fromDisplayName" value="Keycloak Demo"/>
-        <property name="replyTo" value="reply-to@example.com"/> <!-- optional -->
-        <property name="replyToDisplayName" value="Keycloak Demo ReplyTo"/> <!-- optional -->
-        <property name="configSetName" value="my-config-set"/> <!-- optional -->
       </properties>
     </provider>
   </spi>
@@ -53,8 +48,23 @@ Alternatively, you can use this `jboss-cli` script snippet to configure your Key
 ```
 /subsystem=keycloak-server/spi=emailSender/:add(default-provider=aws-ses)
 /subsystem=keycloak-server/spi=emailSender/provider=aws-ses/:add(enabled=true)
-/subsystem=keycloak-server/spi=emailSender/provider=aws-ses/:write-attribute(name=properties,value={"region" => "eu-west-1","from" => "sender@example.com","fromDisplayName" => "Keycloak Demo",...})
+/subsystem=keycloak-server/spi=emailSender/provider=aws-ses/:write-attribute(name=properties,value={"region" => "eu-west-1"})
 ```
+
+As the Email Provider SPI is not selectable/configurable on a per-realm base, you can't set the AWS SES provider for one realm and leave the default SMTP provider in another.
+If you use/configure this SPI to be used in Keyclaok, it's system-wide!
+
+Additionally, Keycloak does not provide a possibility to configure an Email Provider SPI through the admin console with custom values.
+The way described above is the only way.
+
+However, with this SPI implementation, you can use the values for `from`, `fromDisplayName`, `replyTo` and `replyToDisplayName` from the defaut SMTP configuration page in your sent emails:
+
+![](img/config.png)
+
+Will result in:
+
+![](img/email.png)
+
 
 ## AWS Configuration
 

@@ -21,22 +21,19 @@ import java.util.Map;
  */
 public class AwsSesEmailSenderProvider implements EmailSenderProvider {
 
-    private final Map<String, String> configMap;
     private final SesClient ses;
 
-    AwsSesEmailSenderProvider(Map<String, String> configMap, SesClient ses) {
-        this.configMap = configMap;
+    AwsSesEmailSenderProvider(SesClient ses) {
         this.ses = ses;
     }
 
     @Override
     public void send(Map<String, String> config, UserModel user, String subject, String textBody, String htmlBody) throws EmailException {
-        String configSetName = this.configMap.get("configSetName");
 
-        String from = this.configMap.get("from");
-        String fromDisplayName = this.configMap.get("fromDisplayName");
-        String replyTo = this.configMap.get("replyTo");
-        String replyToDisplayName = this.configMap.get("replyToDisplayName");
+        String from = config.get("from");
+        String fromDisplayName = config.get("fromDisplayName");
+        String replyTo = config.get("replyTo");
+        String replyToDisplayName = config.get("replyToDisplayName");
 
         try {
             if (from == null || from.isEmpty()) {
@@ -61,10 +58,6 @@ public class AwsSesEmailSenderProvider implements EmailSenderProvider {
             if (replyTo != null && !replyTo.isEmpty()) {
                 sendEmailRequest.replyToAddresses(
                     Collections.singletonList(toInternetAddress(replyTo, replyToDisplayName).toString()));
-            }
-
-            if (configSetName != null && !configSetName.isEmpty()) {
-                sendEmailRequest.configurationSetName(configSetName);
             }
 
             ses.sendEmail(sendEmailRequest.build());

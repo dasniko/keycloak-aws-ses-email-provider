@@ -23,14 +23,14 @@ class AwsSesEmailSenderProviderIT {
     void testSend() throws EmailException {
         SesClient ses = SesClient.builder().region(Region.EU_WEST_1).build();
 
-        Map<String, String> configMap = new HashMap<>();
-        configMap.put("from", "niko@n-k.de");
-        configMap.put("fromDisplayName", "Keycloak Test");
+        Map<String, String> config = new HashMap<>();
+        config.put("from", "john@example.com");
+        config.put("fromDisplayName", "Keycloak Test");
 
         UserModel user = mock(UserModel.class);
-        when(user.getEmail()).thenReturn("niko@n-k.de");
+        when(user.getEmail()).thenReturn("john@example.com");
 
-        AwsSesEmailSenderProvider provider = new AwsSesEmailSenderProvider(configMap, ses);
-        provider.send(null, user, "Test", "Hello", "<h1>Hello</h1>");
+        AwsSesEmailSenderProvider provider = new AwsSesEmailSenderProvider(ses);
+        provider.send(config, user, "Test", "Hello", "<h1>Hello</h1>");
     }
 }

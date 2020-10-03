@@ -37,24 +37,24 @@ class AwsSesEmailSenderProviderTest {
 
     @Test
     void testSend() throws EmailException {
-        Map<String, String> configMap = new HashMap<>();
-        configMap.put("from", "niko@n-k.de");
+        Map<String, String> config = new HashMap<>();
+        config.put("from", "john@example.com");
 
         when(user.getEmail()).thenReturn("user@example.com");
 
-        provider = new AwsSesEmailSenderProvider(configMap, ses);
-        provider.send(null, user, "Subject", "Text Body", "Html Body");
+        provider = new AwsSesEmailSenderProvider(ses);
+        provider.send(config, user, "Subject", "Text Body", "Html Body");
 
         verify(ses).sendEmail(any(SendEmailRequest.class));
     }
 
     @Test
     void testMissingFromAddress() {
-        Map<String, String> configMap = new HashMap<>();
-        provider = new AwsSesEmailSenderProvider(configMap, ses);
+        Map<String, String> config = new HashMap<>();
+        provider = new AwsSesEmailSenderProvider(ses);
 
         Throwable exception = assertThrows(EmailException.class,
-            () -> provider.send(null, user, "Subject", "Text Body", "Html Body"));
+            () -> provider.send(config, user, "Subject", "Text Body", "Html Body"));
 
         assertTrue(exception.getMessage().contains("from"));
     }
