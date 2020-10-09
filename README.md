@@ -34,6 +34,7 @@ To configure the email provider SPI, include a snippet like this in your `standa
   <spi name="emailSender">
     <default-provider>aws-ses</default-provider>
     <provider name="aws-ses" enabled="true">
+      <!-- Optional, if you want (or need) to set another region for SES as the environment default region: -->
       <properties>
         <property name="region" value="eu-west-1"/>
       </properties>
@@ -46,9 +47,13 @@ To configure the email provider SPI, include a snippet like this in your `standa
 Alternatively, you can use this `jboss-cli` script snippet to configure your Keycloak server:
 
 ```
+if (outcome == success) of /subsystem=keycloak-server/spi=emailSender:read-resource
+  /subsystem=keycloak-server/spi=emailSender/:remove()
+end-if
 /subsystem=keycloak-server/spi=emailSender/:add(default-provider=aws-ses)
 /subsystem=keycloak-server/spi=emailSender/provider=aws-ses/:add(enabled=true)
-/subsystem=keycloak-server/spi=emailSender/provider=aws-ses/:write-attribute(name=properties,value={"region" => "eu-west-1"})
+# Optional, if you want (or need) to set another region for SES as the environment default region:
+# /subsystem=keycloak-server/spi=emailSender/provider=aws-ses/:write-attribute(name=properties,value={"region" => "eu-west-1"})
 ```
 
 As the Email Provider SPI is not selectable/configurable on a per-realm base, you can't set the AWS SES provider for one realm and leave the default SMTP provider in another.
@@ -68,7 +73,10 @@ Will result in:
 
 ## AWS Configuration
 
-This SPI makes use of the [DefaultAWSCredentialsProviderChain](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/auth/DefaultAWSCredentialsProviderChain.html).
-So, it's on you how you configure your Keycloak environment in a way that is able to authenticate itself agains AWS.
+This SPI makes use of the [DefaultAWSCredentialsProviderChain](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/auth/DefaultAWSCredentialsProviderChain.html)
+and the [DefaultAWSRegionProviderChain](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/regions/DefaultAwsRegionProviderChain.html).
+So, it's on you how you configure your Keycloak environment in a way that is able to authenticate itself against AWS.
+
+For specifying a different region for SES usage, see configuration above.
 
 Your used profile needs the privilege to send emails with at least `ses:SendEmail`.

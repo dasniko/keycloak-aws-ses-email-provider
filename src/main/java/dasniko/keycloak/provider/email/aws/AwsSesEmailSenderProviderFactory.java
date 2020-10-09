@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public class AwsSesEmailSenderProviderFactory implements EmailSenderProviderFactory, ServerInfoAwareProviderFactory {
 
-    private Map<String, String> configMap;
+    private final Map<String, String> configMap = new HashMap<>();
     private SesClient ses;
 
     @Override
@@ -28,11 +28,13 @@ public class AwsSesEmailSenderProviderFactory implements EmailSenderProviderFact
     @Override
     public void init(Config.Scope config) {
         String configRegion = config.get("region");
-        configMap = new HashMap<>();
-        configMap.put("region", configRegion);
-
-        Region region = Region.of(configRegion);
-        ses = SesClient.builder().region(region).build();
+        if (configRegion != null) {
+            configMap.put("region", configRegion);
+            Region region = Region.of(configRegion);
+            ses = SesClient.builder().region(region).build();
+        } else {
+            ses = SesClient.create();
+        }
     }
 
     @Override
