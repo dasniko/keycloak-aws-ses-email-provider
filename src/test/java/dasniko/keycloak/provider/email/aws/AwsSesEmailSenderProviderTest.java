@@ -26,8 +26,6 @@ class AwsSesEmailSenderProviderTest {
     private AwsSesEmailSenderProvider provider;
 
     @Mock
-    private UserModel user;
-    @Mock
     private SesClient ses;
 
     @BeforeEach
@@ -40,10 +38,8 @@ class AwsSesEmailSenderProviderTest {
         Map<String, String> config = new HashMap<>();
         config.put("from", "john@example.com");
 
-        when(user.getEmail()).thenReturn("user@example.com");
-
         provider = new AwsSesEmailSenderProvider(ses);
-        provider.send(config, user, "Subject", "Text Body", "Html Body");
+        provider.send(config, "user@example.com", "Subject", "Text Body", "Html Body");
 
         verify(ses).sendEmail(any(SendEmailRequest.class));
     }
@@ -54,7 +50,7 @@ class AwsSesEmailSenderProviderTest {
         provider = new AwsSesEmailSenderProvider(ses);
 
         Throwable exception = assertThrows(EmailException.class,
-            () -> provider.send(config, user, "Subject", "Text Body", "Html Body"));
+            () -> provider.send(config, "user@example.com", "Subject", "Text Body", "Html Body"));
 
         assertTrue(exception.getMessage().contains("from"));
     }

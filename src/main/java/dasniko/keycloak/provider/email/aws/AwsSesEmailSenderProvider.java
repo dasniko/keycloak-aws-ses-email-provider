@@ -28,7 +28,7 @@ public class AwsSesEmailSenderProvider implements EmailSenderProvider {
     }
 
     @Override
-    public void send(Map<String, String> config, UserModel user, String subject, String textBody, String htmlBody) throws EmailException {
+    public void send(Map<String, String> config, String address, String subject, String textBody, String htmlBody) throws EmailException {
 
         String from = config.get("from");
         String fromDisplayName = config.get("fromDisplayName");
@@ -42,7 +42,7 @@ public class AwsSesEmailSenderProvider implements EmailSenderProvider {
 
             SendEmailRequest.Builder sendEmailRequest = SendEmailRequest.builder()
                 .destination(
-                    Destination.builder().toAddresses(user.getEmail()).build()
+                    Destination.builder().toAddresses(address).build()
                 )
                 .message(Message.builder()
                     .subject(Content.builder().charset(StandardCharsets.UTF_8.toString()).data(subject).build())
