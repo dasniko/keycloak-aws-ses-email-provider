@@ -1,5 +1,6 @@
 package dasniko.keycloak.provider.email.aws;
 
+import jakarta.mail.internet.InternetAddress;
 import org.keycloak.email.EmailException;
 import org.keycloak.email.EmailSenderProvider;
 import org.keycloak.models.UserModel;
@@ -11,7 +12,6 @@ import software.amazon.awssdk.services.ses.model.Destination;
 import software.amazon.awssdk.services.ses.model.Message;
 import software.amazon.awssdk.services.ses.model.SendEmailRequest;
 
-import javax.mail.internet.InternetAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
