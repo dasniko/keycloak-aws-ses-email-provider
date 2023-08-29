@@ -1,5 +1,6 @@
 package dasniko.keycloak.provider.email.aws;
 
+import jakarta.mail.internet.InternetAddress;
 import org.keycloak.email.EmailException;
 import org.keycloak.email.EmailSenderProvider;
 import org.keycloak.models.UserModel;
@@ -11,7 +12,6 @@ import software.amazon.awssdk.services.ses.model.Destination;
 import software.amazon.awssdk.services.ses.model.Message;
 import software.amazon.awssdk.services.ses.model.SendEmailRequest;
 
-import javax.mail.internet.InternetAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
@@ -28,7 +28,7 @@ public class AwsSesEmailSenderProvider implements EmailSenderProvider {
     }
 
     @Override
-    public void send(Map<String, String> config, UserModel user, String subject, String textBody, String htmlBody) throws EmailException {
+    public void send(Map<String, String> config, String address, String subject, String textBody, String htmlBody) throws EmailException {
 
         String from = config.get("from");
         String fromDisplayName = config.get("fromDisplayName");
@@ -42,7 +42,7 @@ public class AwsSesEmailSenderProvider implements EmailSenderProvider {
 
             SendEmailRequest.Builder sendEmailRequest = SendEmailRequest.builder()
                 .destination(
-                    Destination.builder().toAddresses(user.getEmail()).build()
+                    Destination.builder().toAddresses(address).build()
                 )
                 .message(Message.builder()
                     .subject(Content.builder().charset(StandardCharsets.UTF_8.toString()).data(subject).build())
